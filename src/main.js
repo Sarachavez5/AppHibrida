@@ -4,67 +4,114 @@ import { HomePage } from './js/pages/HomePage.js';
 import { CalendarPage } from './js/pages/CalendarPage.js';
 import { RegisterPage } from './js/pages/RegisterPage.js';
 import { SymptomsPage } from './js/pages/SymptomsPage.js';
+import { PeriodPage } from './js/pages/PeriodPage.js';
 import { MoodPage } from './js/pages/MoodPage.js';
 import { StatsPage } from './js/pages/StatsPage.js';
 import { ProfilePage } from './js/pages/ProfilePage.js';
 import { EducationPage } from './js/pages/EducationPage.js';
+import { LoginPage } from './js/pages/LoginPage.js';
+import { SignupPage } from './js/pages/SignupPage.js';
+import { authService } from './js/services/AuthService.js';
 
 // Configuración de rutas
 const routes = {
   '/': {
     title: 'Mi Ciclo - Inicio',
     handler: () => {
-      const homePage = new HomePage();
-      homePage.render();
+      if (authService.requireAuth()) {
+        const homePage = new HomePage();
+        homePage.render();
+      }
+    }
+  },
+  '/login': {
+    title: 'Mi Ciclo - Iniciar Sesión',
+    handler: () => {
+      if (authService.requireGuest()) {
+        const loginPage = new LoginPage();
+        loginPage.render();
+      }
+    }
+  },
+  '/registro': {
+    title: 'Mi Ciclo - Crear Cuenta',
+    handler: () => {
+      if (authService.requireGuest()) {
+        const signupPage = new SignupPage();
+        signupPage.render();
+      }
     }
   },
   '/calendario': {
     title: 'Mi Ciclo - Calendario',
     handler: () => {
-      const calendarPage = new CalendarPage();
-      calendarPage.render();
+      if (authService.requireAuth()) {
+        const calendarPage = new CalendarPage();
+        calendarPage.render();
+      }
     }
   },
   '/registrar': {
     title: 'Mi Ciclo - Registrar Actividad',
     handler: () => {
-      const registerPage = new RegisterPage();
-      registerPage.render();
+      if (authService.requireAuth()) {
+        const registerPage = new RegisterPage();
+        registerPage.render();
+      }
     }
   },
   '/sintomas': {
     title: 'Mi Ciclo - Registrar Síntomas',
     handler: () => {
-      const symptomsPage = new SymptomsPage();
-      symptomsPage.render();
+      if (authService.requireAuth()) {
+        const symptomsPage = new SymptomsPage();
+        symptomsPage.render();
+      }
+    }
+  },
+  '/periodo': {
+    title: 'Mi Ciclo - Registrar Período',
+    handler: () => {
+      if (authService.requireAuth()) {
+        const periodPage = new PeriodPage();
+        periodPage.render();
+      }
     }
   },
   '/estado-animo': {
     title: 'Mi Ciclo - Estado de Ánimo',
     handler: () => {
-      const moodPage = new MoodPage();
-      moodPage.render();
+      if (authService.requireAuth()) {
+        const moodPage = new MoodPage();
+        moodPage.render();
+      }
     }
   },
   '/estadisticas': {
     title: 'Mi Ciclo - Estadísticas',
     handler: () => {
-      const statsPage = new StatsPage();
-      statsPage.render();
+      if (authService.requireAuth()) {
+        const statsPage = new StatsPage();
+        statsPage.render();
+      }
     }
   },
   '/perfil': {
     title: 'Mi Ciclo - Perfil',
     handler: () => {
-      const profilePage = new ProfilePage();
-      profilePage.render();
+      if (authService.requireAuth()) {
+        const profilePage = new ProfilePage();
+        profilePage.render();
+      }
     }
   },
   '/educacion': {
     title: 'Mi Ciclo - Educación',
     handler: () => {
-      const educationPage = new EducationPage();
-      educationPage.render();
+      if (authService.requireAuth()) {
+        const educationPage = new EducationPage();
+        educationPage.render();
+      }
     }
   },
   '/404': {

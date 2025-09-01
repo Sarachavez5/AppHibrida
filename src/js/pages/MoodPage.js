@@ -111,13 +111,13 @@ export class MoodPage {
               <span class="bottom-nav__icon">🏠</span>
               <span class="bottom-nav__label">Inicio</span>
             </a>
-            <a href="/calendario" class="bottom-nav__item" aria-label="Calendario">
-              <span class="bottom-nav__icon">📅</span>
-              <span class="bottom-nav__label">Calendario</span>
-            </a>
-            <a href="/registrar" class="bottom-nav__item" aria-label="Registrar">
+            <button class="bottom-nav__item" id="register-btn" aria-label="Registrar">
               <span class="bottom-nav__icon">➕</span>
               <span class="bottom-nav__label">Registrar</span>
+            </button>
+            <a href="/educacion" class="bottom-nav__item" aria-label="Educación">
+              <span class="bottom-nav__icon">📚</span>
+              <span class="bottom-nav__label">Aprende</span>
             </a>
             <a href="/estadisticas" class="bottom-nav__item" aria-label="Estadísticas">
               <span class="bottom-nav__icon">📊</span>
@@ -129,6 +129,33 @@ export class MoodPage {
             </a>
           </div>
         </nav>
+
+        <!-- Register Menu -->
+        <div class="register-menu" id="register-menu">
+          <div class="register-menu__backdrop" id="register-menu-backdrop"></div>
+          <div class="register-menu__content">
+            <div class="register-menu__header">
+              <h3 class="register-menu__title">¿Qué quieres registrar?</h3>
+              <button class="register-menu__close" id="register-menu-close">
+                <span class="icon">✕</span>
+              </button>
+            </div>
+            <div class="register-menu__options">
+              <button class="register-menu__option" data-action="symptoms">
+                <span class="register-menu__icon">🩸</span>
+                <span class="register-menu__label">Síntomas</span>
+              </button>
+              <button class="register-menu__option" data-action="mood">
+                <span class="register-menu__icon">😊</span>
+                <span class="register-menu__label">Estado de ánimo</span>
+              </button>
+              <button class="register-menu__option" data-action="activity">
+                <span class="register-menu__icon">🏃‍♀️</span>
+                <span class="register-menu__label">Actividad física</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     `;
 
@@ -187,8 +214,57 @@ export class MoodPage {
       });
     }
 
+    // Register button in bottom nav
+    const registerBtn = document.getElementById('register-btn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.add('active');
+      });
+    }
+
+    // Register menu close
+    const registerMenuClose = document.getElementById('register-menu-close');
+    if (registerMenuClose) {
+      registerMenuClose.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+      });
+    }
+
+    // Register menu backdrop
+    const registerBackdrop = document.querySelector('.register-menu__backdrop');
+    if (registerBackdrop) {
+      registerBackdrop.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+      });
+    }
+
+    // Register menu options
+    const registerOptions = document.querySelectorAll('.register-menu__option');
+    registerOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const action = option.getAttribute('data-action');
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+        
+        switch(action) {
+          case 'symptoms':
+            window.location.hash = '#/sintomas';
+            break;
+          case 'mood':
+            window.location.hash = '#/estado-animo';
+            break;
+          case 'activity':
+            window.location.hash = '#/registrar';
+            break;
+        }
+      });
+    });
+
     // Bottom navigation
-    const navItems = document.querySelectorAll('.bottom-nav__item');
+    const navItems = document.querySelectorAll('.bottom-nav__item[href]');
     navItems.forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
@@ -230,15 +306,28 @@ export class MoodPage {
     });
   }
 
+  getTodayKey() {
+    const today = new Date();
+    return `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+  }
+
   saveMood() {
+    // Obtener la fecha de hoy (usar el mismo formato que HomePage)
+    const today = this.getTodayKey();
+    const todayKey = `mood_${today}`;
+    
     const moodData = {
       mood: this.selectedMood,
       energy: this.selectedEnergy,
       sleep: this.selectedSleep,
       notes: this.notes,
-      date: new Date().toISOString().split('T')[0]
+      date: today,
+      timestamp: new Date().toISOString()
     };
 
+    // Guardar en localStorage
+    localStorage.setItem(todayKey, JSON.stringify(moodData));
+    
     console.log('Estado de ánimo guardado:', moodData);
     
     // Mostrar mensaje de éxito
