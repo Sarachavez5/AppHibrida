@@ -92,13 +92,13 @@ export class RegisterPage {
               <span class="bottom-nav__icon">🏠</span>
               <span class="bottom-nav__label">Inicio</span>
             </a>
-            <a href="/calendario" class="bottom-nav__item" aria-label="Calendario">
-              <span class="bottom-nav__icon">📅</span>
-              <span class="bottom-nav__label">Calendario</span>
-            </a>
-            <a href="/registrar" class="bottom-nav__item active" aria-label="Registrar">
+            <button class="bottom-nav__item active" aria-label="Registrar">
               <span class="bottom-nav__icon">➕</span>
               <span class="bottom-nav__label">Registrar</span>
+            </button>
+            <a href="/educacion" class="bottom-nav__item" aria-label="Educación">
+              <span class="bottom-nav__icon">📚</span>
+              <span class="bottom-nav__label">Aprende</span>
             </a>
             <a href="/estadisticas" class="bottom-nav__item" aria-label="Estadísticas">
               <span class="bottom-nav__icon">📊</span>

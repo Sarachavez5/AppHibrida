@@ -1,11 +1,13 @@
 /**
  * Página de perfil
  */
+import { authService } from '../services/AuthService.js';
+
 export class ProfilePage {
   constructor() {
-    this.user = {
-      name: 'Juliana Torres',
-      email: 'Juli@gmail.com',
+    this.user = authService.getCurrentUser() || {
+      name: 'Usuario',
+      email: 'usuario@email.com',
       avatar: null
     };
   }
@@ -115,13 +117,13 @@ export class ProfilePage {
               <span class="bottom-nav__icon">🏠</span>
               <span class="bottom-nav__label">Inicio</span>
             </a>
-            <a href="/calendario" class="bottom-nav__item" aria-label="Calendario">
-              <span class="bottom-nav__icon">📅</span>
-              <span class="bottom-nav__label">Calendario</span>
-            </a>
-            <a href="/registrar" class="bottom-nav__item" aria-label="Registrar">
+            <button class="bottom-nav__item" id="register-btn" aria-label="Registrar">
               <span class="bottom-nav__icon">➕</span>
               <span class="bottom-nav__label">Registrar</span>
+            </button>
+            <a href="/educacion" class="bottom-nav__item" aria-label="Educación">
+              <span class="bottom-nav__icon">📚</span>
+              <span class="bottom-nav__label">Aprende</span>
             </a>
             <a href="/estadisticas" class="bottom-nav__item" aria-label="Estadísticas">
               <span class="bottom-nav__icon">📊</span>
@@ -133,6 +135,33 @@ export class ProfilePage {
             </a>
           </div>
         </nav>
+
+        <!-- Register Menu -->
+        <div class="register-menu" id="register-menu">
+          <div class="register-menu__backdrop" id="register-menu-backdrop"></div>
+          <div class="register-menu__content">
+            <div class="register-menu__header">
+              <h3 class="register-menu__title">¿Qué quieres registrar?</h3>
+              <button class="register-menu__close" id="register-menu-close">
+                <span class="icon">✕</span>
+              </button>
+            </div>
+            <div class="register-menu__options">
+              <button class="register-menu__option" data-action="symptoms">
+                <span class="register-menu__icon">🩸</span>
+                <span class="register-menu__label">Síntomas</span>
+              </button>
+              <button class="register-menu__option" data-action="mood">
+                <span class="register-menu__icon">😊</span>
+                <span class="register-menu__label">Estado de ánimo</span>
+              </button>
+              <button class="register-menu__option" data-action="activity">
+                <span class="register-menu__icon">🏃‍♀️</span>
+                <span class="register-menu__label">Actividad física</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     `;
 
@@ -173,8 +202,57 @@ export class ProfilePage {
       });
     }
 
+    // Register button in bottom nav
+    const registerBtn = document.getElementById('register-btn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.add('active');
+      });
+    }
+
+    // Register menu close
+    const registerMenuClose = document.getElementById('register-menu-close');
+    if (registerMenuClose) {
+      registerMenuClose.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+      });
+    }
+
+    // Register menu backdrop
+    const registerBackdrop = document.querySelector('.register-menu__backdrop');
+    if (registerBackdrop) {
+      registerBackdrop.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+      });
+    }
+
+    // Register menu options
+    const registerOptions = document.querySelectorAll('.register-menu__option');
+    registerOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const action = option.getAttribute('data-action');
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+        
+        switch(action) {
+          case 'symptoms':
+            window.location.hash = '#/sintomas';
+            break;
+          case 'mood':
+            window.location.hash = '#/estado-animo';
+            break;
+          case 'activity':
+            window.location.hash = '#/registrar';
+            break;
+        }
+      });
+    });
+
     // Bottom navigation
-    const navItems = document.querySelectorAll('.bottom-nav__item');
+    const navItems = document.querySelectorAll('.bottom-nav__item[href]');
     navItems.forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
@@ -369,10 +447,16 @@ export class ProfilePage {
         cancelText: 'Cancelar'
       }).then((confirmed) => {
         if (confirmed) {
-          console.log('Usuario cerró sesión');
-          // Aquí se podría limpiar datos locales y redirigir a login
+          // Cerrar sesión usando el servicio de autenticación
+          authService.logout();
+          
           import('../components/Toast.js').then(({ Toast }) => {
             Toast.success('Sesión cerrada exitosamente');
+            
+            // Redirigir a la página de login
+            setTimeout(() => {
+              window.location.hash = '#/login';
+            }, 1500);
           });
         }
       });
