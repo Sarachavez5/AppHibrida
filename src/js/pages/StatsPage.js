@@ -1,13 +1,43 @@
 export class StatsPage {
   constructor() {
-    this.averageCycleDuration = 28;
-    this.cycleVariation = '±2 días';
-    this.lastCycles = [
-      { month: 'Jul', duration: 29 },
-      { month: 'Jun', duration: 27 },
-      { month: 'May', duration: 28 },
-      { month: 'Abr', duration: 30 }
-    ];
+    this.cycleService = null;
+    this.cycleStats = null;
+    this.initCycleService();
+  }
+
+  async initCycleService() {
+    try {
+      const { CycleService } = await import('../services/CycleService.js');
+      this.cycleService = new CycleService();
+      
+      // Esperar un poco para asegurar que se inicialice completamente
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      this.updateCycleData();
+      
+      // Re-renderizar después de que CycleService esté listo
+      this.render();
+      
+      console.log('StatsPage renderizado después de CycleService');
+    } catch (error) {
+      console.error('Error al cargar CycleService:', error);
+      // Si falla, renderizar de todas formas
+      this.render();
+    }
+  }
+
+  updateCycleData() {
+    if (this.cycleService) {
+      this.cycleStats = this.cycleService.getCycleStatistics();
+      
+      // Debug: verificar que los datos se carguen
+      console.log('StatsPage - CycleService cargado:', this.cycleService);
+      console.log('StatsPage - Estadísticas del ciclo:', this.cycleStats);
+      console.log('StatsPage - Total de ciclos:', this.cycleStats ? this.cycleStats.totalCycles : 'N/A');
+      console.log('StatsPage - Historial de ciclos:', this.cycleStats ? this.cycleStats.cycleHistory : 'N/A');
+    } else {
+      console.log('StatsPage - CycleService no está disponible aún');
+    }
   }
 
   render() {
@@ -37,8 +67,8 @@ export class StatsPage {
                 <h3 class="stats-card__title">Duración promedio del ciclo</h3>
               </div>
               <div class="stats-card__content">
-                <div class="stats-card__main-value">${this.averageCycleDuration} días</div>
-                <div class="stats-card__subtitle">Últimos 6 meses</div>
+                <div class="stats-card__main-value">${this.cycleStats ? this.cycleStats.averageCycleLength : 28} días</div>
+                <div class="stats-card__subtitle">Basado en ${this.cycleStats ? this.cycleStats.totalCycles : 0} ciclos</div>
               </div>
             </div>
 
@@ -54,7 +84,7 @@ export class StatsPage {
                     <span class="chart-placeholder__text">Gráfico de regularidad</span>
                   </div>
                 </div>
-                <div class="stats-card__variation">Variación: ${this.cycleVariation}</div>
+                <div class="stats-card__variation">Variación: ±${this.cycleStats ? this.cycleStats.cycleVariation : 0} días</div>
               </div>
             </div>
 
@@ -65,12 +95,19 @@ export class StatsPage {
               </div>
               <div class="stats-card__content">
                 <div class="cycles-list">
-                  ${this.lastCycles.map(cycle => `
-                    <div class="cycle-item">
-                      <span class="cycle-item__month">${cycle.month}</span>
-                      <span class="cycle-item__duration">${cycle.duration}d</span>
-                    </div>
-                  `).join('')}
+                  ${this.cycleStats && this.cycleStats.cycleHistory.length > 0 ? 
+                    this.cycleStats.cycleHistory.slice(-6).map(cycle => {
+                      const startDate = new Date(cycle.startDate);
+                      const month = startDate.toLocaleDateString('es-ES', { month: 'short' });
+                      return `
+                        <div class="cycle-item">
+                          <span class="cycle-item__month">${month}</span>
+                          <span class="cycle-item__duration">${cycle.duration}d</span>
+                        </div>
+                      `;
+                    }).join('') : 
+                    '<div class="cycle-item">No hay ciclos registrados</div>'
+                  }
                 </div>
               </div>
             </div>
@@ -78,20 +115,21 @@ export class StatsPage {
             <!-- Additional Stats -->
             <div class="stats-grid">
               <div class="stats-mini-card">
-                <div class="stats-mini-card__value">4</div>
+                <div class="stats-mini-card__value">${this.cycleStats ? this.cycleStats.totalCycles : 0}</div>
                 <div class="stats-mini-card__label">Ciclos registrados</div>
               </div>
               <div class="stats-mini-card">
-                <div class="stats-mini-card__value">85%</div>
+                <div class="stats-mini-card__value">${this.cycleStats && this.cycleStats.totalCycles > 0 ? 
+                  Math.max(0, Math.min(100, 100 - (this.cycleStats.cycleVariation / this.cycleStats.averageCycleLength * 100))) : 0}%</div>
                 <div class="stats-mini-card__label">Regularidad</div>
               </div>
               <div class="stats-mini-card">
-                <div class="stats-mini-card__value">5</div>
+                <div class="stats-mini-card__value">7</div>
                 <div class="stats-mini-card__label">Días fértiles promedio</div>
               </div>
               <div class="stats-mini-card">
-                <div class="stats-mini-card__value">3</div>
-                <div class="stats-mini-card__label">Síntomas más comunes</div>
+                <div class="stats-mini-card__value">${this.cycleStats ? this.cycleStats.currentPhase.symptoms ? this.cycleStats.currentPhase.symptoms.length : 0 : 0}</div>
+                <div class="stats-mini-card__label">Síntomas típicos</div>
               </div>
             </div>
           </div>
@@ -104,13 +142,13 @@ export class StatsPage {
               <span class="bottom-nav__icon">🏠</span>
               <span class="bottom-nav__label">Inicio</span>
             </a>
-            <a href="/calendario" class="bottom-nav__item" aria-label="Calendario">
-              <span class="bottom-nav__icon">📅</span>
-              <span class="bottom-nav__label">Calendario</span>
-            </a>
-            <a href="/registrar" class="bottom-nav__item" aria-label="Registrar">
+            <button class="bottom-nav__item" id="register-btn" aria-label="Registrar">
               <span class="bottom-nav__icon">➕</span>
               <span class="bottom-nav__label">Registrar</span>
+            </button>
+            <a href="/educacion" class="bottom-nav__item" aria-label="Educación">
+              <span class="bottom-nav__icon">📚</span>
+              <span class="bottom-nav__label">Aprende</span>
             </a>
             <a href="/estadisticas" class="bottom-nav__item active" aria-label="Estadísticas">
               <span class="bottom-nav__icon">📊</span>
@@ -122,6 +160,33 @@ export class StatsPage {
             </a>
           </div>
         </nav>
+
+        <!-- Register Menu -->
+        <div class="register-menu" id="register-menu">
+          <div class="register-menu__backdrop" id="register-menu-backdrop"></div>
+          <div class="register-menu__content">
+            <div class="register-menu__header">
+              <h3 class="register-menu__title">¿Qué quieres registrar?</h3>
+              <button class="register-menu__close" id="register-menu-close">
+                <span class="icon">✕</span>
+              </button>
+            </div>
+            <div class="register-menu__options">
+              <button class="register-menu__option" data-action="symptoms">
+                <span class="register-menu__icon">🩸</span>
+                <span class="register-menu__label">Síntomas</span>
+              </button>
+              <button class="register-menu__option" data-action="mood">
+                <span class="register-menu__icon">😊</span>
+                <span class="register-menu__label">Estado de ánimo</span>
+              </button>
+              <button class="register-menu__option" data-action="activity">
+                <span class="register-menu__icon">🏃‍♀️</span>
+                <span class="register-menu__label">Actividad física</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     `;
 
@@ -145,8 +210,57 @@ export class StatsPage {
       });
     }
 
+    // Register button in bottom nav
+    const registerBtn = document.getElementById('register-btn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.add('active');
+      });
+    }
+
+    // Register menu close
+    const registerMenuClose = document.getElementById('register-menu-close');
+    if (registerMenuClose) {
+      registerMenuClose.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+      });
+    }
+
+    // Register menu backdrop
+    const registerBackdrop = document.querySelector('.register-menu__backdrop');
+    if (registerBackdrop) {
+      registerBackdrop.addEventListener('click', () => {
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+      });
+    }
+
+    // Register menu options
+    const registerOptions = document.querySelectorAll('.register-menu__option');
+    registerOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const action = option.getAttribute('data-action');
+        const registerMenu = document.getElementById('register-menu');
+        registerMenu.classList.remove('active');
+        
+        switch(action) {
+          case 'symptoms':
+            window.location.hash = '#/sintomas';
+            break;
+          case 'mood':
+            window.location.hash = '#/estado-animo';
+            break;
+          case 'activity':
+            window.location.hash = '#/registrar';
+            break;
+        }
+      });
+    });
+
     // Bottom navigation
-    const navItems = document.querySelectorAll('.bottom-nav__item');
+    const navItems = document.querySelectorAll('.bottom-nav__item[href]');
     navItems.forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
