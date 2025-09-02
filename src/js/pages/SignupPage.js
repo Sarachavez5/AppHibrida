@@ -34,8 +34,10 @@ export class SignupPage {
             <div class="auth-container">
               <!-- Logo/Brand -->
               <div class="auth-brand">
-                <div class="auth-brand__icon">🌸</div>
-                <h2 class="auth-brand__title">Únete a Mi Ciclo</h2>
+                <div class="auth-brand__icon">
+                  <img src="/logo-sin-texto.png" alt="Ella Logo" class="auth-brand__logo">
+                </div>
+                <h2 class="auth-brand__title">Bienvenido a Ella</h2>
                 <p class="auth-brand__subtitle">Comienza tu viaje de autoconocimiento</p>
               </div>
 

@@ -54,6 +54,52 @@ export class HomePage {
     } else {
       console.log('HomePage - CycleService no está disponible aún');
     }
+
+    // Cargar síntomas y estado de ánimo del día actual
+    this.loadTodayData();
+  }
+
+  loadTodayData() {
+    // Obtener la fecha de hoy en formato YYYY-MM-DD
+    const today = new Date();
+    const dateKey = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    
+    // Cargar síntomas de hoy
+    const symptomsKey = `symptoms_${dateKey}`;
+    const symptomsData = localStorage.getItem(symptomsKey);
+    if (symptomsData) {
+      try {
+        const symptoms = JSON.parse(symptomsData);
+        this.hasSymptoms = true;
+        this.symptomsCount = symptoms.symptoms ? symptoms.symptoms.length : 0;
+        console.log('Síntomas de hoy cargados:', symptoms);
+      } catch (error) {
+        console.error('Error al cargar síntomas:', error);
+        this.hasSymptoms = false;
+        this.symptomsCount = 0;
+      }
+    } else {
+      this.hasSymptoms = false;
+      this.symptomsCount = 0;
+    }
+
+    // Cargar estado de ánimo de hoy
+    const moodKey = `mood_${dateKey}`;
+    const moodData = localStorage.getItem(moodKey);
+    if (moodData) {
+      try {
+        const mood = JSON.parse(moodData);
+        this.hasMoodData = true;
+        console.log('Estado de ánimo de hoy cargado:', mood);
+      } catch (error) {
+        console.error('Error al cargar estado de ánimo:', error);
+        this.hasMoodData = false;
+      }
+    } else {
+      this.hasMoodData = false;
+    }
+
+    console.log('Datos del día cargados - Síntomas:', this.hasSymptoms, 'Cantidad:', this.symptomsCount, 'Estado de ánimo:', this.hasMoodData);
   }
 
   updateCycleData() {
@@ -136,8 +182,9 @@ export class HomePage {
           <div class="app__container">
             <!-- Header with Logo -->
             <div class="home-header">
-              <div class="home-logo">Logo</div>
-              <h1 class="home-title">Mi Ciclo</h1>
+              <div class="home-logo">
+                <img src="/logo.png" alt="Ella Logo" class="home-logo__image">
+              </div>
             </div>
 
             <!-- Cycle Circle -->
@@ -179,10 +226,7 @@ export class HomePage {
           </div>
         </main>
 
-        <!-- Floating Action Button -->
-        <button class="fab" aria-label="Agregar actividad">
-          <span class="fab__icon">+</span>
-        </button>
+
 
         <!-- Side Menu -->
         <div class="side-menu" id="side-menu">

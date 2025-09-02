@@ -27,8 +27,9 @@ export class LoginPage {
             <div class="auth-container">
               <!-- Logo/Brand -->
               <div class="auth-brand">
-                <div class="auth-brand__icon">🌸</div>
-                <h2 class="auth-brand__title">Mi Ciclo</h2>
+                <div class="auth-brand__icon">
+                  <img src="/logo.png" alt="Ella Logo" class="auth-brand__logo">
+                </div>
                 <p class="auth-brand__subtitle">Tu compañera de confianza</p>
               </div>
 

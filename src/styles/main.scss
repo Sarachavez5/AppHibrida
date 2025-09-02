@@ -143,40 +143,7 @@
 }
 
 // =============================================================================
-// FLOATING ACTION BUTTON
-// =============================================================================
 
-.fab {
-  position: fixed;
-  bottom: 100px;
-  right: var(--spacing-lg);
-  z-index: var(--z-index-fixed);
-  width: 56px;
-  height: 56px;
-  border-radius: var(--border-radius-full);
-  background-color: var(--color-primary);
-  color: var(--color-text-light);
-  border: none;
-  box-shadow: var(--shadow-lg);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  @include flex(row, center, center);
-  
-  &:hover {
-    background-color: var(--color-primary-dark);
-    transform: scale(1.05);
-    box-shadow: var(--shadow-xl);
-  }
-  
-  &:active {
-    transform: scale(0.95);
-  }
-  
-  &__icon {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-  }
-}
 
 // =============================================================================
 // PÁGINA PRINCIPAL (HOME)
