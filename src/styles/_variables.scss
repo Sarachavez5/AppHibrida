@@ -29,11 +29,11 @@
   --color-error: #DC3545;             // Rojo error
   --color-info: #17A2B8;              // Azul información
   
-  // Colores específicos del ciclo
-  --color-period: #E91E63;            // Color para días de periodo
-  --color-fertile: #FF9800;           // Color para días fértiles
-  --color-ovulation: #FF5722;         // Color para ovulación
-  --color-safe: #4CAF50;              // Color para días seguros
+  // Colores específicos del ciclo (SOLO 3 COLORES + AZUL PARA HOY)
+  --color-period: #E91E63;            // Rosa fucsia - días de periodo reales (que el usuario registró)
+  --color-fertile: #FFE082;           // Amarillo pastel - días fértiles (históricos y futuros)
+  --color-future-period: #F8BBD9;     // Rosa pastel - días de periodo futuro (predicción)
+  --color-today: #2196F3;             // Azul - día actual
   
   // Colores de estado de ánimo
   --color-mood-happy: #FFD700;        // Feliz - Dorado

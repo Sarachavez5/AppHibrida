@@ -326,15 +326,16 @@
   
   &__day {
     aspect-ratio: 1;
+    position: relative;
     @include flex(row, center, center);
     border-right: 1px solid var(--color-border-light);
     border-bottom: 1px solid var(--color-border-light);
-    cursor: pointer;
+    cursor: default;
     transition: all var(--transition-fast);
     
-    &:hover {
-      background-color: var(--color-background-secondary);
-    }
+    // &:hover {
+    //   background-color: var(--color-background-secondary);
+    // }
     
     &--other-month {
       color: var(--color-text-muted);
@@ -355,14 +356,45 @@
     
     &--fertile {
       background-color: var(--color-fertile);
-      color: var(--color-text-light);
+      color: var(--color-text-primary);
       font-weight: var(--font-weight-semibold);
+    }
+    
+    &--future-period {
+      background-color: var(--color-future-period);
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+    
+    &--future-fertile {
+      background-color: var(--color-fertile);
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+    
+    &--today {
+      background-color: var(--color-today);
+      color: var(--color-text-light);
+      font-weight: var(--font-weight-bold);
+      box-shadow: var(--shadow-md);
     }
   }
   
-  &__day-number {
-    font-size: var(--font-size-sm);
-  }
+      &__day-number {
+      font-size: var(--font-size-sm);
+    }
+    
+    &__day-cycle {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: var(--border-radius-sm);
+      padding: 1px 3px;
+      line-height: 1;
+    }
 }
 
 .calendar-legend {
@@ -387,11 +419,169 @@
     &--fertile {
       background-color: var(--color-fertile);
     }
+    
+    &--future-period {
+      background-color: var(--color-future-period);
+    }
+    
+    &--today {
+      background-color: var(--color-today);
+    }
   }
   
   &__label {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+  }
+}
+
+// =============================================================================
+// INFORMACIÓN DEL CICLO Y ESTADÍSTICAS
+// =============================================================================
+
+.current-cycle-info {
+  margin-bottom: var(--spacing-xl);
+}
+
+.cycle-info {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  
+  &--no-data {
+    text-align: center;
+    color: var(--color-text-secondary);
+    
+    p {
+      margin: var(--spacing-xs) 0;
+      
+      &:first-child {
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary);
+      }
+    }
+  }
+  
+  &__main {
+    @include flex(row, space-between, center);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  &__day {
+    @include flex(column, center, flex-start);
+    
+    .cycle-info__label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .cycle-info__value {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+    }
+  }
+  
+  &__phase {
+    @include flex(column, center, center);
+    text-align: center;
+    
+    .cycle-info__icon {
+      font-size: var(--font-size-2xl);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .cycle-info__name {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+  }
+  
+  &__details {
+    @include flex(row, space-between, center);
+    gap: var(--spacing-md);
+  }
+  
+  &__item {
+    @include flex(column, center, center);
+    text-align: center;
+    
+    .cycle-info__label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .cycle-info__value {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      
+      &--máxima {
+        color: var(--color-error);
+      }
+      
+      &--alta {
+        color: var(--color-warning);
+      }
+      
+      &--media {
+        color: var(--color-info);
+      }
+      
+      &--baja {
+        color: var(--color-success);
+      }
+    }
+  }
+}
+
+.month-stats {
+  margin-top: var(--spacing-xl);
+  
+  &__container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+  }
+  
+  &__title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+  }
+  
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+  }
+  
+  &__item {
+    @include flex(column, center, center);
+    text-align: center;
+    
+    .month-stats__number {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .month-stats__label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      text-align: center;
+      line-height: 1.2;
+    }
   }
 }
 
