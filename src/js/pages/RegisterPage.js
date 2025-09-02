@@ -88,7 +88,7 @@ export class RegisterPage {
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
           <div class="bottom-nav__container">
-            <a href="/" class="bottom-nav__item" aria-label="Inicio">
+            <a href="#/" class="bottom-nav__item" aria-label="Inicio">
               <span class="bottom-nav__icon">🏠</span>
               <span class="bottom-nav__label">Inicio</span>
             </a>
@@ -96,15 +96,15 @@ export class RegisterPage {
               <span class="bottom-nav__icon">➕</span>
               <span class="bottom-nav__label">Registrar</span>
             </button>
-            <a href="/educacion" class="bottom-nav__item" aria-label="Educación">
+            <a href="#/educacion" class="bottom-nav__item" aria-label="Educación">
               <span class="bottom-nav__icon">📚</span>
               <span class="bottom-nav__label">Aprende</span>
             </a>
-            <a href="/estadisticas" class="bottom-nav__item" aria-label="Estadísticas">
+            <a href="#/estadisticas" class="bottom-nav__item" aria-label="Estadísticas">
               <span class="bottom-nav__icon">📊</span>
               <span class="bottom-nav__label">Estadísticas</span>
             </a>
-            <a href="/perfil" class="bottom-nav__item" aria-label="Perfil">
+            <a href="#/perfil" class="bottom-nav__item" aria-label="Perfil">
               <span class="bottom-nav__icon">👤</span>
               <span class="bottom-nav__label">Perfil</span>
             </a>
@@ -173,8 +173,13 @@ export class RegisterPage {
       item.addEventListener('click', (e) => {
         e.preventDefault();
         const href = item.getAttribute('href');
-        if (href && href !== '/registrar') {
-          window.location.hash = `#${href}`;
+        if (href && href !== '#/registrar') {
+          // Si href ya tiene #, usarlo directamente, si no, agregarlo
+          if (href.startsWith('#')) {
+            window.location.hash = href;
+          } else {
+            window.location.hash = `#${href}`;
+          }
         }
       });
     });
