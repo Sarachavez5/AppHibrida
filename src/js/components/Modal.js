@@ -16,7 +16,7 @@ export class Modal extends Component {
     };
   }
   
-  bindEvents() {
+    bindEvents() {
     // Cerrar con backdrop
     if (this.options.backdrop) {
       this.on('click', (e) => {
@@ -28,17 +28,19 @@ export class Modal extends Component {
     
     // Cerrar con tecla Escape
     if (this.options.keyboard) {
-      document.addEventListener('keydown', (e) => {
+      this.keydownHandler = (e) => {
         if (e.key === 'Escape' && this.isVisible()) {
           this.hide();
         }
-      });
+      };
+      document.addEventListener('keydown', this.keydownHandler);
     }
     
     // Botón de cerrar
     const closeBtn = this.find('.modal__close');
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.hide());
+      this.closeBtnHandler = () => this.hide();
+      closeBtn.addEventListener('click', this.closeBtnHandler);
     }
     
     // Eventos personalizados
