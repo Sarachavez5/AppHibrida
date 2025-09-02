@@ -174,12 +174,30 @@ export class ProfilePage {
       .toUpperCase();
   }
 
-  // Método para cerrar modal actual si existe
   closeCurrentModal() {
     if (this.currentModal && !this.currentModal.isDestroyed) {
       this.currentModal.hide();
       this.currentModal = null;
     }
+  }
+
+  // Método helper para crear modales
+  async createModal(content, options) {
+    // Cerrar modal actual si existe
+    this.closeCurrentModal();
+    
+    // Importar Modal dinámicamente
+    const { Modal } = await import('../components/Modal.js');
+    
+    // Crear nuevo modal
+    this.currentModal = Modal.create(content, options);
+    
+    // Limpiar referencia cuando se destruya
+    this.currentModal.on('modal:destroyed', () => {
+      this.currentModal = null;
+    });
+    
+    return this.currentModal;
   }
 
   bindEvents() {
@@ -191,12 +209,22 @@ export class ProfilePage {
       });
     }
 
-    // Settings items
+    // Settings items - Usar throttle para prevenir múltiples clics rápidos
     const settingsItems = document.querySelectorAll('.settings-item');
     settingsItems.forEach(item => {
-      item.addEventListener('click', () => {
+      let isProcessing = false;
+      
+      item.addEventListener('click', async () => {
+        if (isProcessing) return; // Prevenir múltiples clics
+        
+        isProcessing = true;
         const setting = item.dataset.setting;
-        this.handleSettingClick(setting);
+        await this.handleSettingClick(setting);
+        
+        // Resetear después de un breve delay
+        setTimeout(() => {
+          isProcessing = false;
+        }, 300);
       });
     });
 
@@ -275,180 +303,209 @@ export class ProfilePage {
     });
   }
 
-  handleSettingClick(setting) {
+  async handleSettingClick(setting) {
     console.log(`Configuración seleccionada: ${setting}`);
     
     switch (setting) {
       case 'cycle':
-        this.showCycleSettings();
+        await this.showCycleSettings();
         break;
       case 'reminders':
-        this.showRemindersSettings();
+        await this.showRemindersSettings();
         break;
       case 'privacy':
-        this.showPrivacySettings();
+        await this.showPrivacySettings();
         break;
       case 'notifications':
-        this.showNotificationsSettings();
+        await this.showNotificationsSettings();
         break;
       case 'help':
-        this.showHelp();
+        await this.showHelp();
         break;
       case 'about':
-        this.showAbout();
+        await this.showAbout();
         break;
       default:
         console.log('Configuración no implementada');
     }
   }
 
-  showCycleSettings() {
-    // Importar Modal dinámicamente
-    import('../components/Modal.js').then(({ Modal }) => {
-      Modal.create(`
-        <div class="cycle-settings">
-          <h3>Configuración del Ciclo</h3>
-          <p>Aquí puedes configurar la duración promedio de tu ciclo, la fecha de tu último periodo, y otros ajustes relacionados con tu ciclo menstrual.</p>
-          <div class="form-group">
-            <label>Duración promedio del ciclo (días):</label>
-            <input type="number" value="28" min="21" max="35" class="form-input">
-          </div>
-          <div class="form-group">
-            <label>Fecha del último periodo:</label>
-            <input type="date" class="form-input">
-          </div>
+  async showCycleSettings() {
+    const modal = await this.createModal(`
+      <div class="cycle-settings">
+        <h3>Configuración del Ciclo</h3>
+        <p>Aquí puedes configurar la duración promedio de tu ciclo, la fecha de tu último periodo, y otros ajustes relacionados con tu ciclo menstrual.</p>
+        <div class="form-group">
+          <label>Duración promedio del ciclo (días):</label>
+          <input type="number" value="28" min="21" max="35" class="form-input">
         </div>
-      `, {
-        title: 'Ajustes del Ciclo',
-        footer: '<button class="btn btn--primary">Guardar</button>'
-      });
+        <div class="form-group">
+          <label>Fecha del último periodo:</label>
+          <input type="date" class="form-input">
+        </div>
+      </div>
+    `, {
+      title: 'Ajustes del Ciclo',
+      footer: '<button class="btn btn--primary cycle-save-btn">Guardar</button>'
+    });
+
+    // Agregar event listener para el botón guardar
+    modal.on('click', (e) => {
+      if (e.target.classList.contains('cycle-save-btn')) {
+        console.log('Guardando configuración del ciclo...');
+        modal.hide();
+      }
     });
   }
 
-  showRemindersSettings() {
-    import('../components/Modal.js').then(({ Modal }) => {
-      Modal.create(`
-        <div class="reminders-settings">
-          <h3>Recordatorios</h3>
-          <p>Configura las notificaciones para recordarte eventos importantes de tu ciclo.</p>
-          <div class="reminder-option">
-            <label>
-              <input type="checkbox" checked> Recordar próximo periodo
-            </label>
-          </div>
-          <div class="reminder-option">
-            <label>
-              <input type="checkbox" checked> Recordar ventana fértil
-            </label>
-          </div>
-          <div class="reminder-option">
-            <label>
-              <input type="checkbox"> Recordar tomar medicamentos
-            </label>
-          </div>
+  async showRemindersSettings() {
+    const modal = await this.createModal(`
+      <div class="reminders-settings">
+        <h3>Recordatorios</h3>
+        <p>Configura las notificaciones para recordarte eventos importantes de tu ciclo.</p>
+        <div class="reminder-option">
+          <label>
+            <input type="checkbox" checked> Recordar próximo periodo
+          </label>
         </div>
-      `, {
-        title: 'Recordatorios',
-        footer: '<button class="btn btn--primary">Guardar</button>'
-      });
+        <div class="reminder-option">
+          <label>
+            <input type="checkbox" checked> Recordar ventana fértil
+          </label>
+        </div>
+        <div class="reminder-option">
+          <label>
+            <input type="checkbox"> Recordar tomar medicamentos
+          </label>
+        </div>
+      </div>
+    `, {
+      title: 'Recordatorios',
+      footer: '<button class="btn btn--primary reminders-save-btn">Guardar</button>'
+    });
+
+    modal.on('click', (e) => {
+      if (e.target.classList.contains('reminders-save-btn')) {
+        console.log('Guardando recordatorios...');
+        modal.hide();
+      }
     });
   }
 
-  showPrivacySettings() {
-    import('../components/Modal.js').then(({ Modal }) => {
-      Modal.create(`
-        <div class="privacy-settings">
-          <h3>Privacidad y Datos</h3>
-          <p>Controla cómo se manejan tus datos personales y de salud.</p>
-          <div class="privacy-option">
-            <label>
-              <input type="checkbox" checked> Sincronizar con la nube
-            </label>
-          </div>
-          <div class="privacy-option">
-            <label>
-              <input type="checkbox"> Compartir datos anónimos para investigación
-            </label>
-          </div>
-          <div class="privacy-option">
-            <label>
-              <input type="checkbox" checked> Requerir autenticación biométrica
-            </label>
-          </div>
+  async showPrivacySettings() {
+    const modal = await this.createModal(`
+      <div class="privacy-settings">
+        <h3>Privacidad y Datos</h3>
+        <p>Controla cómo se manejan tus datos personales y de salud.</p>
+        <div class="privacy-option">
+          <label>
+            <input type="checkbox" checked> Sincronizar con la nube
+          </label>
         </div>
-      `, {
-        title: 'Privacidad y Datos',
-        footer: '<button class="btn btn--primary">Guardar</button>'
-      });
+        <div class="privacy-option">
+          <label>
+            <input type="checkbox"> Compartir datos anónimos para investigación
+          </label>
+        </div>
+        <div class="privacy-option">
+          <label>
+            <input type="checkbox" checked> Requerir autenticación biométrica
+          </label>
+        </div>
+      </div>
+    `, {
+      title: 'Privacidad y Datos',
+      footer: '<button class="btn btn--primary privacy-save-btn">Guardar</button>'
+    });
+
+    modal.on('click', (e) => {
+      if (e.target.classList.contains('privacy-save-btn')) {
+        console.log('Guardando configuración de privacidad...');
+        modal.hide();
+      }
     });
   }
 
-  showNotificationsSettings() {
-    import('../components/Modal.js').then(({ Modal }) => {
-      Modal.create(`
-        <div class="notifications-settings">
-          <h3>Notificaciones</h3>
-          <p>Configura qué notificaciones quieres recibir y cuándo.</p>
-          <div class="notification-option">
-            <label>
-              <input type="checkbox" checked> Notificaciones push
-            </label>
-          </div>
-          <div class="notification-option">
-            <label>
-              <input type="checkbox" checked> Notificaciones por email
-            </label>
-          </div>
-          <div class="notification-option">
-            <label>
-              <input type="checkbox"> Notificaciones de recordatorio
-            </label>
-          </div>
+  async showNotificationsSettings() {
+    const modal = await this.createModal(`
+      <div class="notifications-settings">
+        <h3>Notificaciones</h3>
+        <p>Configura qué notificaciones quieres recibir y cuándo.</p>
+        <div class="notification-option">
+          <label>
+            <input type="checkbox" checked> Notificaciones push
+          </label>
         </div>
-      `, {
-        title: 'Notificaciones',
-        footer: '<button class="btn btn--primary">Guardar</button>'
-      });
+        <div class="notification-option">
+          <label>
+            <input type="checkbox" checked> Notificaciones por email
+          </label>
+        </div>
+        <div class="notification-option">
+          <label>
+            <input type="checkbox"> Notificaciones de recordatorio
+          </label>
+        </div>
+      </div>
+    `, {
+      title: 'Notificaciones',
+      footer: '<button class="btn btn--primary notifications-save-btn">Guardar</button>'
+    });
+
+    modal.on('click', (e) => {
+      if (e.target.classList.contains('notifications-save-btn')) {
+        console.log('Guardando configuración de notificaciones...');
+        modal.hide();
+      }
     });
   }
 
-  showHelp() {
-    import('../components/Modal.js').then(({ Modal }) => {
-      Modal.create(`
-        <div class="help-content">
-          <h3>Ayuda y Soporte</h3>
-          <p>¿Necesitas ayuda con la aplicación? Aquí tienes algunas opciones:</p>
-          <ul>
-            <li><strong>FAQ:</strong> Preguntas frecuentes</li>
-            <li><strong>Contacto:</strong> support@miciclo.com</li>
-            <li><strong>Chat:</strong> Disponible 24/7</li>
-            <li><strong>Manual:</strong> Guía de usuario completa</li>
-          </ul>
-        </div>
-      `, {
-        title: 'Ayuda y Soporte',
-        footer: '<button class="btn btn--primary">Contactar Soporte</button>'
-      });
+  async showHelp() {
+    const modal = await this.createModal(`
+      <div class="help-content">
+        <h3>Ayuda y Soporte</h3>
+        <p>¿Necesitas ayuda con la aplicación? Aquí tienes algunas opciones:</p>
+        <ul>
+          <li><strong>FAQ:</strong> Preguntas frecuentes</li>
+          <li><strong>Contacto:</strong> support@miciclo.com</li>
+          <li><strong>Chat:</strong> Disponible 24/7</li>
+          <li><strong>Manual:</strong> Guía de usuario completa</li>
+        </ul>
+      </div>
+    `, {
+      title: 'Ayuda y Soporte',
+      footer: '<button class="btn btn--primary help-contact-btn">Contactar Soporte</button>'
+    });
+
+    modal.on('click', (e) => {
+      if (e.target.classList.contains('help-contact-btn')) {
+        console.log('Contactando soporte...');
+        modal.hide();
+      }
     });
   }
 
-  showAbout() {
-    import('../components/Modal.js').then(({ Modal }) => {
-      Modal.create(`
-        <div class="about-content">
-          <h3>Acerca de Mi Ciclo</h3>
-          <p><strong>Versión:</strong> 1.0.0</p>
-          <p><strong>Desarrollado por:</strong> Equipo de Desarrollo</p>
-          <p>Mi Ciclo es una aplicación diseñada para ayudar a las mujeres a llevar un seguimiento completo de su ciclo menstrual, proporcionando información valiosa sobre su salud reproductiva.</p>
-          <p>© 2024 Mi Ciclo. Todos los derechos reservados.</p>
-        </div>
-      `, {
-        title: 'Acerca de la App',
-        footer: '<button class="btn btn--primary">Cerrar</button>'
-      });
+  async showAbout() {
+    const modal = await this.createModal(`
+      <div class="about-content">
+        <h3>Acerca de Mi Ciclo</h3>
+        <p><strong>Versión:</strong> 1.0.0</p>
+        <p><strong>Desarrollado por:</strong> Equipo de Desarrollo</p>
+        <p>Mi Ciclo es una aplicación diseñada para ayudar a las mujeres a llevar un seguimiento completo de su ciclo menstrual, proporcionando información valiosa sobre su salud reproductiva.</p>
+        <p>© 2024 Mi Ciclo. Todos los derechos reservados.</p>
+      </div>
+    `, {
+      title: 'Acerca de la App',
+      footer: '<button class="btn btn--primary about-close-btn">Cerrar</button>'
+    });
+
+    modal.on('click', (e) => {
+      if (e.target.classList.contains('about-close-btn')) {
+        modal.hide();
+      }
     });
   }
-
+  
   handleLogout() {
     // Importar Modal dinámicamente
     import('../components/Modal.js').then(({ Modal }) => {
