@@ -48,9 +48,6 @@ export class StatsPage {
         <!-- Header -->
         <header class="app-header">
           <div class="app-header__container">
-            <button class="app-header__menu-btn" aria-label="Menú">
-              <span class="icon">☰</span>
-            </button>
             <h1 class="app-header__title">Mis Estadísticas</h1>
             <button class="app-header__profile-btn" aria-label="Perfil">
               <span class="icon">👤</span>

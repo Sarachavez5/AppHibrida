@@ -127,9 +127,6 @@ export class CalendarPage {
         <!-- Header -->
         <header class="app-header">
           <div class="app-header__container">
-            <button class="app-header__menu-btn" aria-label="Menú">
-              <span class="icon">☰</span>
-            </button>
             <h1 class="app-header__title">Calendario</h1>
             <button class="app-header__calendar-btn" aria-label="Ver calendario completo">
               <span class="icon">📅</span>
