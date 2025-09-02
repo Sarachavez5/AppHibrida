@@ -505,29 +505,24 @@ export class ProfilePage {
       }
     });
   }
-  
-  handleLogout() {
+
+  async handleLogout() {
     // Importar Modal dinámicamente
-    import('../components/Modal.js').then(({ Modal }) => {
-      Modal.confirm('¿Estás segura de que quieres cerrar sesión?', {
-        title: 'Cerrar Sesión',
-        confirmText: 'Sí, cerrar sesión',
-        cancelText: 'Cancelar'
-      }).then((confirmed) => {
-        if (confirmed) {
-          // Cerrar sesión usando el servicio de autenticación
-          authService.logout();
-          
-          import('../components/Toast.js').then(({ Toast }) => {
-            Toast.success('Sesión cerrada exitosamente');
-            
-            // Redirigir a la página de login
-            setTimeout(() => {
-              window.location.hash = '#/login';
-            }, 1500);
-          });
-        }
-      });
-    });
+    const { Modal } = await import('../components/Modal.js');
+    
+    const confirmed = await Modal.confirm('¿Estás segura de que quieres cerrar sesión?', 'Cerrar Sesión');
+    
+    if (confirmed) {
+      // Cerrar sesión usando el servicio de autenticación
+      authService.logout();
+      
+      const { Toast } = await import('../components/Toast.js');
+      Toast.success('Sesión cerrada exitosamente');
+      
+      // Redirigir a la página de login
+      setTimeout(() => {
+        window.location.hash = '#/login';
+      }, 1500);
+    }
   }
 }
