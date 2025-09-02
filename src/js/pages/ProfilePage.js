@@ -1,6 +1,3 @@
-/**
- * Página de perfil
- */
 import { authService } from '../services/AuthService.js';
 
 export class ProfilePage {
@@ -10,6 +7,7 @@ export class ProfilePage {
       email: 'usuario@email.com',
       avatar: null
     };
+    this.currentModal = null; // Referencia al modal actual
   }
 
   render() {
@@ -167,7 +165,7 @@ export class ProfilePage {
 
     this.bindEvents();
   }
-
+  
   getInitials(name) {
     return name
       .split(' ')
