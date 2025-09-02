@@ -40,24 +40,20 @@ export class HomePage {
   }
 
   loadUserData() {
-    // Cargar datos de síntomas desde localStorage
-    const todayKey = this.getTodayKey();
-    const symptomKey = `symptoms_${todayKey}`;
-    
-    const todaySymptoms = localStorage.getItem(symptomKey);
-    
-    if (todaySymptoms) {
-      const symptomsData = JSON.parse(todaySymptoms);
-      this.hasSymptoms = symptomsData.symptoms && symptomsData.symptoms.length > 0;
-      this.symptomsCount = symptomsData.symptoms ? symptomsData.symptoms.length : 0;
+    if (this.cycleService) {
+      // Forzar migración de datos existentes para corregir el historial
+      this.cycleService.forceDataMigration();
+      
+      // Obtener estadísticas actualizadas
+      this.cycleStats = this.cycleService.getCycleStatistics();
+      
+      console.log('HomePage - CycleService cargado:', this.cycleService);
+      console.log('HomePage - Estadísticas del ciclo:', this.cycleStats);
+      console.log('HomePage - Total de ciclos:', this.cycleStats ? this.cycleStats.totalCycles : 'N/A');
+      console.log('HomePage - Historial de ciclos:', this.cycleStats ? this.cycleStats.cycleHistory : 'N/A');
     } else {
-      this.hasSymptoms = false;
-      this.symptomsCount = 0;
+      console.log('HomePage - CycleService no está disponible aún');
     }
-    
-    // Cargar datos de estado de ánimo
-    const todayMood = localStorage.getItem(`mood_${this.getTodayKey()}`);
-    this.hasMoodData = todayMood && JSON.parse(todayMood);
   }
 
   updateCycleData() {
@@ -197,31 +193,31 @@ export class HomePage {
             </button>
           </div>
           <div class="side-menu__content">
-            <a href="/periodo" class="side-menu__item">
+            <a href="#/periodo" class="side-menu__item">
               <span class="side-menu__icon">🩸</span>
               <span class="side-menu__text">Registrar Período</span>
             </a>
-            <a href="/sintomas" class="side-menu__item">
+            <a href="#/sintomas" class="side-menu__item">
               <span class="side-menu__icon">📝</span>
               <span class="side-menu__text">Registrar Síntomas</span>
             </a>
-            <a href="/estado-animo" class="side-menu__item">
+            <a href="#/estado-animo" class="side-menu__item">
               <span class="side-menu__icon">😊</span>
               <span class="side-menu__text">Estado de Ánimo</span>
             </a>
-            <a href="/educacion" class="side-menu__item">
+            <a href="#/educacion" class="side-menu__item">
               <span class="side-menu__icon">📚</span>
               <span class="side-menu__text">Educación</span>
             </a>
-            <a href="/calendario" class="side-menu__item">
+            <a href="#/calendario" class="side-menu__item">
               <span class="side-menu__icon">📅</span>
               <span class="side-menu__text">Calendario</span>
             </a>
-            <a href="/estadisticas" class="side-menu__item">
+            <a href="#/estadisticas" class="side-menu__item">
               <span class="side-menu__icon">📊</span>
               <span class="side-menu__text">Estadísticas</span>
             </a>
-            <a href="/perfil" class="side-menu__item">
+            <a href="#/perfil" class="side-menu__item">
               <span class="side-menu__icon">👤</span>
               <span class="side-menu__text">Perfil</span>
             </a>
@@ -256,7 +252,7 @@ export class HomePage {
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
           <div class="bottom-nav__container">
-            <a href="/" class="bottom-nav__item active" aria-label="Inicio">
+            <a href="#/" class="bottom-nav__item active" aria-label="Inicio">
               <span class="bottom-nav__icon">🏠</span>
               <span class="bottom-nav__label">Inicio</span>
             </a>
@@ -264,15 +260,15 @@ export class HomePage {
               <span class="bottom-nav__icon">➕</span>
               <span class="bottom-nav__label">Registrar</span>
             </button>
-            <a href="/educacion" class="bottom-nav__item" aria-label="Educación">
+            <a href="#/educacion" class="bottom-nav__item" aria-label="Educación">
               <span class="bottom-nav__icon">📚</span>
               <span class="bottom-nav__label">Aprende</span>
             </a>
-            <a href="/estadisticas" class="bottom-nav__item" aria-label="Estadísticas">
+            <a href="#/estadisticas" class="bottom-nav__item" aria-label="Estadísticas">
               <span class="bottom-nav__icon">📊</span>
               <span class="bottom-nav__label">Estadísticas</span>
             </a>
-            <a href="/perfil" class="bottom-nav__item" aria-label="Perfil">
+            <a href="#/perfil" class="bottom-nav__item" aria-label="Perfil">
               <span class="bottom-nav__icon">👤</span>
               <span class="bottom-nav__label">Perfil</span>
             </a>
@@ -310,7 +306,12 @@ export class HomePage {
         e.preventDefault();
         const href = item.getAttribute('href');
         if (href) {
-          window.location.hash = `#${href}`;
+          // Si href ya tiene #, usarlo directamente, si no, agregarlo
+          if (href.startsWith('#')) {
+            window.location.hash = href;
+          } else {
+            window.location.hash = `#${href}`;
+          }
           // Close menu after navigation
           const sideMenu = document.getElementById('side-menu');
           sideMenu.classList.remove('active');
@@ -389,38 +390,47 @@ export class HomePage {
       item.addEventListener('click', (e) => {
         e.preventDefault();
         const href = item.getAttribute('href');
-        if (href && href !== '/') {
-          window.location.hash = `#${href}`;
+        if (href && href !== '#/') {
+          // Si href ya tiene #, usarlo directamente, si no, agregarlo
+          if (href.startsWith('#')) {
+            window.location.hash = href;
+          } else {
+            window.location.hash = `#${href}`;
+          }
         }
       });
     });
   }
 
   registerPeriod() {
-    const today = new Date().toISOString().split('T')[0];
-    localStorage.setItem('lastPeriod', today);
+    if (!this.cycleService) {
+      console.error('CycleService no disponible');
+      return;
+    }
+
+    const today = new Date();
+    const success = this.cycleService.recordPeriod(today);
     
-    // Actualizar las predicciones del ciclo
-    const cycleData = {
-      lastPeriod: today,
-      nextPeriod: this.getDaysToNextPeriod(),
-      fertileWindow: this.getDaysToFertileWindow(),
-      currentPhase: this.getCurrentPhase(),
-      pregnancyProbability: this.getPregnancyProbability()
-    };
-    localStorage.setItem('cycle_predictions', JSON.stringify(cycleData));
-    
-    // Actualizar los datos del ciclo
-    this.loadUserData();
-    
-    // Mostrar mensaje de confirmación
-    import('../components/Toast.js').then(({ Toast }) => {
-      Toast.success('Período registrado exitosamente. Datos actualizados.');
-    });
-    
-    // Volver a renderizar para mostrar la información actualizada
-    setTimeout(() => {
-      this.render();
-    }, 1500);
+    if (success) {
+      console.log('Período registrado exitosamente en CycleService');
+      
+      // Actualizar los datos del ciclo
+      this.loadUserData();
+      
+      // Mostrar mensaje de confirmación
+      import('../components/Toast.js').then(({ Toast }) => {
+        Toast.success('Período registrado exitosamente. Datos actualizados.');
+      });
+      
+      // Volver a renderizar para mostrar la información actualizada
+      setTimeout(() => {
+        this.render();
+      }, 1500);
+    } else {
+      console.error('Falló el registro del período');
+      import('../components/Toast.js').then(({ Toast }) => {
+        Toast.error('Ya tienes un período registrado para hoy');
+      });
+    }
   }
 }
