@@ -7,7 +7,7 @@ export class ProfilePage {
       email: 'usuario@email.com',
       avatar: null
     };
-    this.currentModal = null; // Referencia al modal actual
+    this.currentModal = null;
   }
 
   render() {
@@ -175,18 +175,16 @@ export class ProfilePage {
     }
   }
 
-  // Método helper para crear modales
   async createModal(content, options) {
-    // Cerrar modal actual si existe
     this.closeCurrentModal();
     
-    // Importar Modal dinámicamente
+    
     const { Modal } = await import('../components/Modal.js');
     
-    // Crear nuevo modal
+    
     this.currentModal = Modal.create(content, options);
     
-    // Limpiar referencia cuando se destruya
+    
     this.currentModal.on('modal:destroyed', () => {
       this.currentModal = null;
     });
@@ -195,7 +193,6 @@ export class ProfilePage {
   }
 
   bindEvents() {
-    // Menu button
     const menuBtn = document.querySelector('.app-header__menu-btn');
     if (menuBtn) {
       menuBtn.addEventListener('click', () => {
