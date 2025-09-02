@@ -18,9 +18,20 @@ const routes = {
   '/': {
     title: 'Mi Ciclo - Inicio',
     handler: () => {
-      if (authService.requireAuth()) {
+      // Temporalmente sin autenticación para pruebas
+      try {
         const homePage = new HomePage();
         homePage.render();
+      } catch (error) {
+        console.error('Error al renderizar HomePage:', error);
+        // Fallback simple
+        document.getElementById('app').innerHTML = `
+          <div style="padding: 20px; text-align: center;">
+            <h1>Mi Ciclo</h1>
+            <p>Error al cargar la página: ${error.message}</p>
+            <button onclick="location.reload()">Recargar</button>
+          </div>
+        `;
       }
     }
   },
@@ -45,9 +56,20 @@ const routes = {
   '/calendario': {
     title: 'Mi Ciclo - Calendario',
     handler: () => {
-      if (authService.requireAuth()) {
+      // Temporalmente sin autenticación para pruebas
+      try {
         const calendarPage = new CalendarPage();
         calendarPage.render();
+      } catch (error) {
+        console.error('Error al renderizar CalendarPage:', error);
+        // Fallback simple
+        document.getElementById('app').innerHTML = `
+          <div style="padding: 20px; text-align: center;">
+            <h1>Calendario</h1>
+            <p>Error al cargar el calendario: ${error.message}</p>
+            <button onclick="window.location.hash = '#/'">Volver al inicio</button>
+          </div>
+        `;
       }
     }
   },
