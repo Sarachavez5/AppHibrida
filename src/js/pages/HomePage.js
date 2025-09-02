@@ -170,7 +170,7 @@ export class HomePage {
             <button class="app-header__menu-btn" aria-label="Menú">
               <span class="icon">☰</span>
             </button>
-            <h1 class="app-header__title">31 de agosto</h1>
+            <h1 class="app-header__title">${this.getCurrentDate()}</h1>
             <button class="app-header__calendar-btn" aria-label="Ver calendario completo">
               <span class="icon">📅</span>
             </button>
