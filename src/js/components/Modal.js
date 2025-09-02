@@ -49,7 +49,7 @@ export class Modal extends Component {
   }
   
   show() {
-    if (this.isVisible()) return;
+    if (this.isVisible() || this.isDestroyed) return;
     
     // Prevenir scroll del body
     document.body.classList.add('no-scroll');
