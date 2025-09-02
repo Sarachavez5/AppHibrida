@@ -3,6 +3,7 @@ import { Component } from './Component.js';
 export class Modal extends Component {
   constructor(element, options = {}) {
     super(element, options);
+    this.isDestroyed = false;
   }
   
   get defaultOptions() {
@@ -10,7 +11,8 @@ export class Modal extends Component {
       backdrop: true,
       keyboard: true,
       focus: true,
-      autoFocus: true
+      autoFocus: true,
+      destroyOnHide: true 
     };
   }
   
