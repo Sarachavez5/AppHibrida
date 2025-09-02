@@ -351,6 +351,8 @@ export class CalendarPage {
       
       // Aplicar clases según el estado del ciclo (pero solo si no es hoy)
       if (!day.isToday) {
+        // Aplicar clases según el estado
+        
         switch (day.state) {
           case 'periodo':
             dayClass += ' calendar__day--period';

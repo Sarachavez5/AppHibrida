@@ -155,11 +155,16 @@ export class CalendarService {
     const daysSinceLastPeriod = this.calculateDaysBetween(lastPeriodDate, date);
     let cycleDay = daysSinceLastPeriod + 1;
 
-    // Ajustar cycleDay si la fecha está en un ciclo futuro
-    let currentCycleStartDate = new Date(lastPeriodDate);
-    while (date.getTime() >= new Date(currentCycleStartDate.getTime() + (averageCycleLength * 24 * 60 * 60 * 1000))) {
-      currentCycleStartDate = new Date(currentCycleStartDate.getTime() + (averageCycleLength * 24 * 60 * 60 * 1000));
-      cycleDay = this.calculateDaysBetween(currentCycleStartDate, date) + 1;
+    // Determinar si está en el ciclo actual o en ciclos futuros
+    const originalCycleStartDate = new Date(lastPeriodDate);
+    const currentCycleEndDate = new Date(originalCycleStartDate);
+    currentCycleEndDate.setDate(originalCycleStartDate.getDate() + averageCycleLength - 1);
+    const isCurrentCycle = date.getTime() <= currentCycleEndDate.getTime();
+    
+    // Solo calcular cycleDay para el ciclo actual
+    if (!isCurrentCycle) {
+      // Para ciclos futuros, no usar la lógica de cycleDay normal
+      cycleDay = null;
     }
 
     // Calcular duración del período actual (usar la última duración registrada o 5 días por defecto)
@@ -181,42 +186,47 @@ export class CalendarService {
     let state = 'normal';
     let phaseName = 'Fase lútea'; // Default
 
-    if (cycleDay >= 1 && cycleDay <= menstrualEnd) {
-      state = 'periodo';
-      phaseName = 'Fase menstrual';
-    } else if (cycleDay >= fertileStart && cycleDay <= fertileEnd) {
-      console.log(`DEBUG - Día fértil: fecha=${date.toISOString().split('T')[0]}, cycleDay=${cycleDay}, fertileStart=${fertileStart}, fertileEnd=${fertileEnd}`);
-      state = 'fertil';
-      phaseName = 'Ventana fértil';
-    } else if (cycleDay > menstrualEnd && cycleDay < fertileStart) {
-      state = 'normal';
-      phaseName = 'Fase folicular';
-    } else {
-      state = 'normal';
-      phaseName = 'Fase lútea';
+    // Solo aplicar lógica de ciclo para el ciclo actual
+    if (isCurrentCycle && cycleDay !== null) {
+      if (cycleDay >= 1 && cycleDay <= menstrualEnd) {
+        state = 'periodo';
+        phaseName = 'Fase menstrual';
+      } else if (cycleDay >= fertileStart && cycleDay <= fertileEnd) {
+        state = 'fertil';
+        phaseName = 'Ventana fértil';
+      } else if (cycleDay > menstrualEnd && cycleDay < fertileStart) {
+        state = 'normal';
+        phaseName = 'Fase folicular';
+      } else {
+        state = 'normal';
+        phaseName = 'Fase lútea';
+      }
     }
 
-    // Predicciones para el futuro (solo después del ciclo actual Y sin datos registrados)
-    const cycleStartDate = new Date(lastPeriodDate);
-    const currentCycleEndDate = new Date(cycleStartDate);
-    currentCycleEndDate.setDate(cycleStartDate.getDate() + averageCycleLength - 1);
-    
-    // Solo hacer predicciones si la fecha está después del ciclo actual
-    if (date.getTime() > currentCycleEndDate.getTime() && !this.hasUserDataForDate(date)) {
+    // Predicciones para el futuro (para todas las fechas futuras sin datos registrados)
+    if (date.getTime() > today.getTime() && !this.hasUserDataForDate(date)) {
       const currentCycleDay = this.cycleService.getCurrentCycleDay();
-      const daysToNextPeriod = averageCycleLength - currentCycleDay + 1;
-      
       const daysDiff = this.calculateDaysBetween(today, date);
       
-      // Predicción de período futuro (5 días)
-      if (daysDiff >= daysToNextPeriod && daysDiff < daysToNextPeriod + 5) {
-        state = 'futuro_periodo';
-        phaseName = 'Período predicho';
-      }
-      // Predicción de ventana fértil futura (6 días) - aproximadamente 14 días antes del próximo período
-      else if (daysDiff >= (daysToNextPeriod - 14) && daysDiff < (daysToNextPeriod - 8)) {
-        state = 'futuro_fertil';
-        phaseName = 'Ventana fértil predicha';
+      // Calcular en qué ciclo futuro está esta fecha
+      const daysToNextPeriod = averageCycleLength - currentCycleDay + 1;
+      
+      // Si está dentro de un rango de predicción (múltiples ciclos)
+      if (daysDiff >= daysToNextPeriod) {
+        // Calcular el día relativo dentro del patrón de ciclos futuros
+        const daysSinceFirstPrediction = daysDiff - daysToNextPeriod;
+        const relativeCycleDay = (daysSinceFirstPrediction % averageCycleLength) + 1;
+        
+        // Predicción de período futuro (5 días al inicio de cada ciclo)
+        if (relativeCycleDay >= 1 && relativeCycleDay <= 5) {
+          state = 'futuro_periodo';
+          phaseName = 'Período predicho';
+        }
+        // Predicción de ventana fértil futura (6 días, empezando 9 días después del inicio del ciclo)
+        else if (relativeCycleDay >= 9 && relativeCycleDay <= 14) {
+          state = 'futuro_fertil';
+          phaseName = 'Ventana fértil predicha';
+        }
       }
     }
 
