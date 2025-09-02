@@ -268,6 +268,65 @@ export class CycleService {
   }
 
   /**
+   * Fuerza la migración de datos existentes
+   * Útil para corregir el historial cuando ya hay datos pero no están en el historial
+   */
+  forceDataMigration() {
+    console.log('Forzando migración de datos...');
+    const migrated = this.migrateExistingData();
+    
+    if (migrated) {
+      console.log('✅ Datos migrados exitosamente');
+      return true;
+    } else {
+      console.log('ℹ️ No se requirió migración de datos');
+      return false;
+    }
+  }
+
+  /**
+   * Migra datos existentes y corrige el historial
+   * @returns {boolean} True si se migraron datos
+   */
+  migrateExistingData() {
+    const data = this.getCycleData();
+    
+    // Si ya hay lastPeriod pero no hay historial, crear el primer ciclo
+    if (data.lastPeriod && data.cycleHistory.length === 0) {
+      console.log('Migrando datos existentes...');
+      
+      const lastPeriodDate = new Date(data.lastPeriod);
+      const today = new Date();
+      const daysSince = this.calculateDaysBetween(lastPeriodDate, today);
+      
+      // Si han pasado más de 21 días, crear un ciclo completo
+      if (daysSince >= 21) {
+        data.cycleHistory.push({
+          startDate: data.lastPeriod,
+          endDate: new Date(lastPeriodDate.getTime() + (data.averageCycleLength * 24 * 60 * 60 * 1000)).toISOString(),
+          duration: data.averageCycleLength
+        });
+        
+        console.log('Ciclo migrado:', data.cycleHistory[0]);
+      } else {
+        // Si no han pasado suficientes días, crear un ciclo en progreso
+        data.cycleHistory.push({
+          startDate: data.lastPeriod,
+          endDate: null, // Ciclo en progreso
+          duration: null
+        });
+        
+        console.log('Ciclo en progreso migrado:', data.cycleHistory[0]);
+      }
+      
+      this.saveCycleData(data);
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
    * Obtiene estadísticas del ciclo
    * @returns {Object} Estadísticas completas
    */
