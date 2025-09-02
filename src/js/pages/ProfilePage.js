@@ -165,13 +165,21 @@ export class ProfilePage {
 
     this.bindEvents();
   }
-  
+
   getInitials(name) {
     return name
       .split(' ')
       .map(word => word.charAt(0))
       .join('')
       .toUpperCase();
+  }
+
+  // Método para cerrar modal actual si existe
+  closeCurrentModal() {
+    if (this.currentModal && !this.currentModal.isDestroyed) {
+      this.currentModal.hide();
+      this.currentModal = null;
+    }
   }
 
   bindEvents() {
