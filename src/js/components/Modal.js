@@ -81,7 +81,7 @@ export class Modal extends Component {
   }
   
   hide() {
-    if (!this.isVisible()) return;
+    if (!this.isVisible() || this.isDestroyed) return;
     
     // Remover clase show para trigger transition
     this.removeClass('show');
@@ -93,17 +93,62 @@ export class Modal extends Component {
       document.body.classList.remove('no-scroll');
       this.off('transitionend', handleTransitionEnd);
       this.emit('modal:hidden');
+      
+      // Destruir el modal si está configurado para hacerlo
+      if (this.options.destroyOnHide) {
+        this.destroy();
+      }
     };
     
     this.on('transitionend', handleTransitionEnd);
+    
+    // Fallback si no hay transición CSS
+    setTimeout(handleTransitionEnd, 300);
+  }
+  
+  destroy() {
+    if (this.isDestroyed) return;
+    
+    this.isDestroyed = true;
+    
+    // Remover event listeners
+    if (this.keydownHandler) {
+      document.removeEventListener('keydown', this.keydownHandler);
+    }
+    
+    const closeBtn = this.find('.modal__close');
+    if (closeBtn && this.closeBtnHandler) {
+      closeBtn.removeEventListener('click', this.closeBtnHandler);
+    }
+    
+    // Remover del DOM
+    if (this.element && this.element.parentNode) {
+      this.element.parentNode.removeChild(this.element);
+    }
+    
+    // Restaurar scroll del body si es necesario
+    document.body.classList.remove('no-scroll');
+    
+    this.emit('modal:destroyed');
   }
   
   isVisible() {
-    return this.hasClass('active');
+    return !this.isDestroyed && this.hasClass('active');
   }
   
   // Métodos estáticos para crear modales dinámicamente
   static create(content, options = {}) {
+    // Verificar si ya existe un modal activo y cerrarlo
+    const existingModal = document.querySelector('.modal.active');
+    if (existingModal) {
+      const existingModalInstance = existingModal._modalInstance;
+      if (existingModalInstance) {
+        existingModalInstance.hide();
+      } else {
+        existingModal.remove();
+      }
+    }
+    
     const modalElement = document.createElement('div');
     modalElement.className = 'modal';
     modalElement.innerHTML = `
@@ -122,7 +167,13 @@ export class Modal extends Component {
     
     document.body.appendChild(modalElement);
     
-    const modal = new Modal(modalElement, options);
+    const modal = new Modal(modalElement, {
+      ...options,
+      destroyOnHide: options.destroyOnHide !== false // Por defecto true
+    });
+    
+    // Guardar referencia en el elemento para poder acceder después
+    modalElement._modalInstance = modal;
     
     // Auto show
     if (options.autoShow !== false) {
@@ -135,7 +186,7 @@ export class Modal extends Component {
   static alert(message, title = 'Alerta') {
     return this.create(message, {
       title,
-      footer: '<button class="btn btn--primary">Aceptar</button>',
+      footer: '<button class="btn btn--primary modal-accept-btn">Aceptar</button>',
       autoShow: true
     });
   }
@@ -159,6 +210,11 @@ export class Modal extends Component {
           modal.hide();
           resolve(false);
         }
+      });
+      
+      // Si el modal se cierra de otra forma, resolver como false
+      modal.on('modal:hidden', () => {
+        resolve(false);
       });
     });
   }
