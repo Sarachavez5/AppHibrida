@@ -1,0 +1,132 @@
+// =============================================================================
+// VARIABLES DE TEMA - APP CICLO MENSTRUAL
+// =============================================================================
+
+// Colores principales
+:root {
+  // Colores primarios - Paleta cálida y confiable
+  --color-primary: #E91E63;           // Rosa principal
+  --color-primary-light: #F8BBD9;     // Rosa claro
+  --color-primary-dark: #C2185B;      // Rosa oscuro
+  --color-secondary: #9C27B0;         // Púrpura secundario
+  --color-secondary-light: #E1BEE7;   // Púrpura claro
+  --color-secondary-dark: #7B1FA2;    // Púrpura oscuro
+  
+  // Colores de fondo
+  --color-background: #FFFFFF;        // Fondo principal
+  --color-background-secondary: #F8F9FA; // Fondo secundario
+  --color-background-tertiary: #F0F2F5;  // Fondo terciario
+  
+  // Colores de texto
+  --color-text-primary: #2C3E50;      // Texto principal
+  --color-text-secondary: #6C757D;    // Texto secundario
+  --color-text-muted: #ADB5BD;        // Texto atenuado
+  --color-text-light: #FFFFFF;        // Texto claro
+  
+  // Colores de estado
+  --color-success: #28A745;           // Verde éxito
+  --color-warning: #FFC107;           // Amarillo advertencia
+  --color-error: #DC3545;             // Rojo error
+  --color-info: #17A2B8;              // Azul información
+  
+  // Colores específicos del ciclo (SOLO 3 COLORES + AZUL PARA HOY)
+  --color-period: #E91E63;            // Rosa fucsia - días de periodo reales (que el usuario registró)
+  --color-fertile: #FFE082;           // Amarillo pastel - días fértiles (históricos y futuros)
+  --color-future-period: #F8BBD9;     // Rosa pastel - días de periodo futuro (predicción)
+  --color-today: #2196F3;             // Azul - día actual
+  
+  // Colores de estado de ánimo
+  --color-mood-happy: #FFD700;        // Feliz - Dorado
+  --color-mood-sensitive: #FF69B4;    // Sensible - Rosa
+  --color-mood-sad: #87CEEB;          // Triste - Azul claro
+  --color-mood-anxious: #DDA0DD;      // Ansiosa - Lavanda
+  
+  // Colores de energía
+  --color-energy-low: #FF6B6B;        // Baja energía - Rojo
+  --color-energy-medium: #FFA726;     // Energía media - Naranja
+  --color-energy-high: #66BB6A;       // Alta energía - Verde
+  
+  // Colores de calidad del sueño
+  --color-sleep-bad: #EF5350;         // Mal sueño - Rojo
+  --color-sleep-regular: #FFA726;     // Sueño regular - Naranja
+  --color-sleep-good: #66BB6A;        // Buen sueño - Verde
+  
+  // Colores de borde
+  --color-border: #E9ECEF;            // Borde principal
+  --color-border-light: #F8F9FA;      // Borde claro
+  --color-border-dark: #DEE2E6;       // Borde oscuro
+  
+  // Sombras
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+  
+  // Espaciado
+  --spacing-xs: 0.25rem;    // 4px
+  --spacing-sm: 0.5rem;     // 8px
+  --spacing-md: 1rem;       // 16px
+  --spacing-lg: 1.5rem;     // 24px
+  --spacing-xl: 2rem;       // 32px
+  --spacing-2xl: 3rem;      // 48px
+  
+  // Border radius
+  --border-radius-sm: 0.25rem;   // 4px
+  --border-radius-md: 0.5rem;    // 8px
+  --border-radius-lg: 1rem;      // 16px
+  --border-radius-xl: 1.5rem;    // 24px
+  --border-radius-full: 50%;     // Círculo
+  
+  // Tipografía
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-secondary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --font-size-xs: 0.75rem;    // 12px
+  --font-size-sm: 0.875rem;   // 14px
+  --font-size-base: 1rem;     // 16px
+  --font-size-lg: 1.125rem;   // 18px
+  --font-size-xl: 1.25rem;    // 20px
+  --font-size-2xl: 1.5rem;    // 24px
+  --font-size-3xl: 1.875rem;  // 30px
+  --font-size-4xl: 2.25rem;   // 36px
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  // Transiciones
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  // Breakpoints
+  --breakpoint-mobile: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  
+  // Z-index
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+  --z-index-toast: 1080;
+}
+
+// Modo oscuro (opcional)
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1A1A1A;
+    --color-background-secondary: #2D2D2D;
+    --color-background-tertiary: #404040;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #B0B0B0;
+    --color-text-muted: #808080;
+    --color-border: #404040;
+    --color-border-light: #2D2D2D;
+    --color-border-dark: #505050;
+  }
+}
