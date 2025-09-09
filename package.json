@@ -10,7 +10,9 @@
     "cap:add": "npx cap add android",
     "cap:sync": "npx cap sync",
     "cap:open": "npx cap open android",
-    "cap:run": "npx cap run android"
+    "cap:run": "npx cap run android",
+    "setup:android": "npm install && npm run build && npx cap add android && npx cap sync",
+    "android:dev": "npm run build && npx cap sync && npx cap open android"
   },
   "devDependencies": {
     "@capacitor/android": "^6.0.0",
