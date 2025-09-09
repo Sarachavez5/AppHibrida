@@ -353,7 +353,6 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ## 🔮 Próximas Características
 
-- [ ] **Sincronización en la Nube**
 - [ ] **Notificaciones Push**
 - [ ] **Exportación de Datos**
 - [ ] **Modo Oscuro**
